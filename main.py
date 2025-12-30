@@ -17,67 +17,34 @@ License: MIT License
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from hmac import new
 from hashlib import sha1
+from base64 import b32decode
 
 import time
 
-TIME_STEP = 30
 
 
 class TOTP:
-    def __init__(self, secret, digits=6, adjusted_time=None):
+    def __init__(self, secret, name="NOT SET", digits=6):
+        self.name = name
         self.__secret = secret
         self.__digits = digits
         self.__last_updated = time.time()
 
         self.__counter = None
-        self.__adjusted_time = None
 
         self.totp = None
-
-        if adjusted_time is not None:
-            self.__adjusted_time = datetime.strptime(adjusted_time, "%Y-%m-%d %H:%M:%S")
 
         self.__update_counter()
         self.__set_hotp()
 
-    def __b32decode(self, encoded_str):
-        """Performs Bas32Decode. Can be replaced with a call to: `base64.b32decode(secret_padded, casefold=True))`."""
-
-        # Define the Base32 alphabet
-        BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-        decoded_bytes = bytearray()
-
-        # Convert the encoded string to uppercase
-        encoded_str = encoded_str.upper().strip()
-
-        # Remove padding characters
-        padding_len = len(encoded_str) % 8
-        if padding_len:
-            encoded_str += "=" * (8 - padding_len)
-
-        # Process each chunk of 8 characters
-        for i in range(0, len(encoded_str), 8):
-            chunk = encoded_str[i : i + 8]
-            bits = 0
-            for char in chunk:
-                if char == "=":
-                    bits += 5  # Skip padding
-                    continue
-
-                bits = (bits << 5) | BASE32_ALPHABET.index(char)
-
-            # Append the decoded bytes
-            for j in range(5):
-                if (bits >> (8 * (4 - j))) & 0xFF:
-                    decoded_bytes.append((bits >> (8 * (4 - j))) & 0xFF)
-
-        return bytes(decoded_bytes)
-
     def __custom_pack_q(self, value):
-        """Pack an unsigned long long (8 bytes) into binary format. Can be placed with call to: `struct.pack(">Q", self.counter)`."""
+        """
+        Pack an unsigned long long (8 bytes) into binary format. Can be 
+        placed with call to: `struct.pack(">Q", self.counter)`.
+        """
 
         if not isinstance(value, int) or value < 0:
             raise ValueError(
@@ -92,10 +59,10 @@ class TOTP:
 
         # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
         secret_padded = self.__secret.upper() + "=" * ((8 - len(self.__secret) % 8) % 8)
-        secret_bytes = self.__b32decode(secret_padded)
+        secret_bytes = b32decode(secret_padded, casefold=True) # self.__b32decode(secret_padded)
 
         # Convert the counter to a 64-bit, big-endian integer.
-        counter_bytes = self.__custom_pack_q(self.__counter)
+        counter_bytes =  self.__custom_pack_q(self.__counter)
 
         # Calculate HMAC-SHA1 digest
         hmac_digest = new(secret_bytes, counter_bytes, sha1).digest()
@@ -116,10 +83,9 @@ class TOTP:
         self.totp = str(truncated % (10**self.__digits)).zfill(self.__digits)
 
     def __update_counter(self):
-        if self.__adjusted_time is None:
-            time_value = time.time()
-        else:
-            time_value = abs((datetime.now() - self.__adjusted_time).total_seconds())
+        TIME_STEP = 30
+       
+        time_value = time.time()
 
         self.__counter = int(time_value // TIME_STEP)
         self.__last_updated = datetime.now()
@@ -165,6 +131,10 @@ def load_secrets(filepath):
         raise PermissionError(f"Permission error on when opening {filepath}")
 
     for line in file_contents:
+        # Skip empty lines
+        if len(line) <= 1:
+            continue
+
         key, value = line.split("=")
         secrets_dict[key.strip()] = value.strip()
 
@@ -179,3 +149,4 @@ if __name__ == "__main__":
     while True:
         print(totp.get_totp())
         time.sleep(5)
+
