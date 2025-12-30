@@ -41,6 +41,7 @@ class TOTP:
             self.__adjusted_time = datetime.strptime(adjusted_time, "%Y-%m-%d %H:%M:%S")
 
         self.__update_counter()
+        self.__set_hotp()
 
     def __b32decode(self, encoded_str):
         """Performs Bas32Decode. Can be replaced with a call to: `base64.b32decode(secret_padded, casefold=True))`."""
@@ -86,7 +87,7 @@ class TOTP:
         # Convert value to 8 bytes in big-endian.
         return value.to_bytes(length=8, byteorder="big")
 
-    def __get_hotp(self):
+    def __set_hotp(self):
         """Generate an HMAC-based One-Time Passwords (HOTP) code."""
 
         # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
@@ -112,7 +113,7 @@ class TOTP:
         )
 
         # Calculate the final code by taking the integer modulo 10^digits.
-        return str(truncated % (10**self.__digits)).zfill(self.__digits)
+        self.totp = str(truncated % (10**self.__digits)).zfill(self.__digits)
 
     def __update_counter(self):
         if self.__adjusted_time is None:
@@ -123,10 +124,19 @@ class TOTP:
         self.__counter = int(time_value // TIME_STEP)
         self.__last_updated = datetime.now()
 
+    def __is_old(self):
+        if time.time() - self.__last_updated.timestamp() >= 30:
+            return True
+
+        return False
+
     def get_totp(self):
         """Generate a TOTP code for the current time."""
+        if self.__is_old():
+            self.__update_counter()
+            self.__set_hotp()
 
-        return self.__get_hotp()
+        return self.totp
 
 
 def load_secrets(filepath):
