@@ -130,6 +130,11 @@ class TOTP:
 
         return False
 
+    def get_totp_fmt(self):
+        """Prints the TOTP in the format `xxx xxx`."""
+        self.get_totp()
+        return self.totp[0:3] + " " + self.totp[3:]
+
     def get_totp(self):
         """Generate a TOTP code for the current time."""
         if self.__is_old():
