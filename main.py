@@ -127,24 +127,37 @@ class TOTP:
         return self.__get_hotp()
 
 
-if __name__ == "__main__":
+def load_secrets(filepath):
+    """
+    Loads secret key-values pairs from a given file.
+
+    :param filepath: Path to file containing secrets.
+    """
+
     secrets_dict = {}
     file_contents = []
 
     try:
-        with open("./.env", "r") as file:
+        with open(filepath, "r") as file:
             file_contents = file.readlines()
 
     except FileNotFoundError:
-        pass
+        raise FileNotFoundError(f"Could not open file at {filepath}")
+
+    except PermissionError:
+        raise PermissionError(f"Permission error on when opening {filepath}")
 
     for line in file_contents:
         key, value = line.split("=")
         secrets_dict[key.strip()] = value.strip()
 
-    test = "I65VU7K5ZQL7WB4E"
+    return secrets_dict
 
-    totp = TOTP(test)
+
+if __name__ == "__main__":
+    secrets_dict = load_secrets(".env")
+
+    totp = TOTP(secrets_dict["test"])
 
     while True:
         print(totp.get_totp())
