@@ -30,10 +30,15 @@ class TOTP:
     def __init__(self, secret, digits=6, adjusted_time=None):
         self.__secret = secret
         self.__digits = digits
-        self.__adjusted_time = adjusted_time
         self.__last_updated = time.time()
+
         self.__counter = None
+        self.__adjusted_time = None
+
         self.totp = None
+
+        if adjusted_time is not None:
+            self.__adjusted_time = datetime.strptime(adjusted_time, "%Y-%m-%d %H:%M:%S")
 
         self.__update_counter()
 
@@ -111,14 +116,11 @@ class TOTP:
 
     def __update_counter(self):
         if self.__adjusted_time is None:
-            self.__counter = int(time.time() // TIME_STEP)
-            return
+            time_value = time.time()
+        else:
+            time_value = abs((datetime.now() - self.__adjusted_time).total_seconds())
 
-        adjusted_datetime = datetime.strptime(self.__adjusted_time, "%Y-%m-%d %H:%M:%S")
-
-        temp_counter = abs((datetime.now() - adjusted_datetime).total_seconds())
-
-        self.__counter = int(temp_counter // TIME_STEP)
+        self.__counter = int(time_value // TIME_STEP)
         self.__last_updated = datetime.now()
 
     def get_totp(self):
