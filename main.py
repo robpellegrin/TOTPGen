@@ -28,11 +28,11 @@ TIME_STEP = 30
 
 class TOTP:
     def __init__(self, secret, digits=6, adjusted_time=None):
-        self.secret = secret
-        self.digits = digits
-        self.adjusted_time = adjusted_time
-        self.last_updated = time.time()
-        self.counter = None
+        self.__secret = secret
+        self.__digits = digits
+        self.__adjusted_time = adjusted_time
+        self.__last_updated = time.time()
+        self.__counter = None
         self.totp = None
 
         self.__update_counter()
@@ -85,11 +85,11 @@ class TOTP:
         """Generate an HMAC-based One-Time Passwords (HOTP) code."""
 
         # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
-        secret_padded = self.secret.upper() + "=" * ((8 - len(self.secret) % 8) % 8)
+        secret_padded = self.__secret.upper() + "=" * ((8 - len(self.__secret) % 8) % 8)
         secret_bytes = self.__b32decode(secret_padded)
 
         # Convert the counter to a 64-bit, big-endian integer.
-        counter_bytes = self.__custom_pack_q(self.counter)
+        counter_bytes = self.__custom_pack_q(self.__counter)
 
         # Calculate HMAC-SHA1 digest
         hmac_digest = new(secret_bytes, counter_bytes, sha1).digest()
@@ -107,19 +107,19 @@ class TOTP:
         )
 
         # Calculate the final code by taking the integer modulo 10^digits.
-        return str(truncated % (10**self.digits)).zfill(self.digits)
+        return str(truncated % (10**self.__digits)).zfill(self.__digits)
 
     def __update_counter(self):
-        if self.adjusted_time is None:
-            self.counter = int(time.time() // TIME_STEP)
+        if self.__adjusted_time is None:
+            self.__counter = int(time.time() // TIME_STEP)
             return
 
-        adjusted_datetime = datetime.strptime(self.adjusted_time, "%Y-%m-%d %H:%M:%S")
+        adjusted_datetime = datetime.strptime(self.__adjusted_time, "%Y-%m-%d %H:%M:%S")
 
         temp_counter = abs((datetime.now() - adjusted_datetime).total_seconds())
 
-        self.counter = int(temp_counter // TIME_STEP)
-        self.last_updated = datetime.now()
+        self.__counter = int(temp_counter // TIME_STEP)
+        self.__last_updated = datetime.now()
 
     def get_totp(self):
         """Generate a TOTP code for the current time."""
