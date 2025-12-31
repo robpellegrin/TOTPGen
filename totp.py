@@ -1,9 +1,31 @@
+"""
+TOTPGen: A simple Python module for generating Time-based One-Time Passwords (TOTP) with minimal dependencies.
+
+This module provides functionality to generate secure one-time passwords
+using a shared secret.
+
+Usage:
+
+Dependencies:
+    - Requires Python 3.x and no additional libraries.
+
+Author:  Rob Pellegrin
+Date:    12/29/2025
+File:    totp.py
+
+Updated: 12/30/2025
+License: MIT License
+
+https://www.ietf.org/rfc/inline-errata/rfc6238.html
+"""
+
 from datetime import datetime
 from hmac import new
 from hashlib import sha1
 from base64 import b32decode
 
 import time
+
 
 class TOTP:
     def __init__(self, secret, name="NOT SET", digits=6):
@@ -113,5 +135,3 @@ class TOTP:
             self.__set_hotp()
 
         return self.totp
-
-
