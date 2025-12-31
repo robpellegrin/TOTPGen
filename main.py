@@ -57,7 +57,11 @@ class TOTP:
         return value.to_bytes(length=8, byteorder="big")
 
     def __set_hotp(self):
-        """Generate an HMAC-based One-Time Passwords (HOTP) code."""
+        """
+        Generate an HMAC-based One-Time Passwords (HOTP) code.
+
+        :param self:
+        """
 
         # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
         secret_padded = self.__secret.upper() + "=" * ((8 - len(self.__secret) % 8) % 8)
@@ -98,7 +102,7 @@ class TOTP:
         on the last_updated member variable. Returns true if the TOTP is old,
         false otherwise.
 
-        :param self: Description
+        :param self:
         """
 
         current_time = time.time()
@@ -109,13 +113,21 @@ class TOTP:
         return False
 
     def get_totp_fmt(self):
-        """Prints the TOTP in the format `xxx xxx`."""
+        """
+        Prints the current TOTP in the format `xxx xxx`.
+
+        :param self:
+        """
         self.get_totp()
 
         return self.totp[:3] + " " + self.totp[3:]
 
     def get_totp(self):
-        """Generate a TOTP code for the current time."""
+        """
+        Generate a TOTP code for the current time.
+
+        :param self:
+        """
         if self.__is_old():
             self.__update_counter()
             self.__set_hotp()
@@ -126,6 +138,7 @@ class TOTP:
 def load_secrets(filepath):
     """
     Loads secret key-values pairs from a given file.
+    Secrets are expected to be formatted as `key=value`.
 
     :param filepath: Path to file containing secrets.
     """
