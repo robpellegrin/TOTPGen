@@ -11,7 +11,7 @@ Dependencies:
 
 Author:  Rob Pellegrin
 Date:    12/29/2025
-Updated: 12/29/2025
+Updated: 12/30/2025
 License: MIT License
 
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
@@ -23,7 +23,6 @@ from hashlib import sha1
 from base64 import b32decode
 
 import time
-
 
 
 class TOTP:
@@ -42,7 +41,7 @@ class TOTP:
 
     def __custom_pack_q(self, value):
         """
-        Pack an unsigned long long (8 bytes) into binary format. Can be 
+        Pack an unsigned long long (8 bytes) into binary format. Can be
         placed with call to: `struct.pack(">Q", self.counter)`.
         """
 
@@ -59,10 +58,12 @@ class TOTP:
 
         # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
         secret_padded = self.__secret.upper() + "=" * ((8 - len(self.__secret) % 8) % 8)
-        secret_bytes = b32decode(secret_padded, casefold=True) # self.__b32decode(secret_padded)
+        secret_bytes = b32decode(
+            secret_padded, casefold=True
+        )  # self.__b32decode(secret_padded)
 
         # Convert the counter to a 64-bit, big-endian integer.
-        counter_bytes =  self.__custom_pack_q(self.__counter)
+        counter_bytes = self.__custom_pack_q(self.__counter)
 
         # Calculate HMAC-SHA1 digest
         hmac_digest = new(secret_bytes, counter_bytes, sha1).digest()
@@ -84,10 +85,8 @@ class TOTP:
 
     def __update_counter(self):
         TIME_STEP = 30
-       
-        time_value = time.time()
 
-        self.__counter = int(time_value // TIME_STEP)
+        self.__counter = int(time.time() // TIME_STEP)
         self.__last_updated = datetime.now()
 
     def __is_old(self):
@@ -149,4 +148,3 @@ if __name__ == "__main__":
     while True:
         print(totp.get_totp())
         time.sleep(5)
-
