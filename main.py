@@ -27,7 +27,7 @@ import time
 
 class TOTP:
     def __init__(self, secret, name="NOT SET", digits=6):
-        self.name = name
+        self.name = name.upper()
         self.__secret = secret
         self.__digits = digits
         self.__last_updated = time.time()
@@ -38,6 +38,9 @@ class TOTP:
 
         self.__update_counter()
         self.__set_hotp()
+
+    def __str__(self):
+        return f"{self.name:<10}:  {self.get_totp_fmt()}"
 
     def __custom_pack_q(self, value):
         """
@@ -90,7 +93,17 @@ class TOTP:
         self.__last_updated = datetime.now()
 
     def __is_old(self):
-        if time.time() - self.__last_updated.timestamp() >= 30:
+        """
+        Method to check if the current TOTP is 30 seconds old or older based
+        on the last_updated member variable. Returns true if the TOTP is old,
+        false otherwise.
+
+        :param self: Description
+        """
+
+        current_time = time.time()
+
+        if (current_time - self.__last_updated.timestamp()) >= 30:
             return True
 
         return False
@@ -98,7 +111,8 @@ class TOTP:
     def get_totp_fmt(self):
         """Prints the TOTP in the format `xxx xxx`."""
         self.get_totp()
-        return self.totp[0:3] + " " + self.totp[3:]
+
+        return self.totp[:3] + " " + self.totp[3:]
 
     def get_totp(self):
         """Generate a TOTP code for the current time."""
@@ -135,16 +149,25 @@ def load_secrets(filepath):
             continue
 
         key, value = line.split("=")
+
         secrets_dict[key.strip()] = value.strip()
 
     return secrets_dict
 
 
-if __name__ == "__main__":
+def main():
     secrets_dict = load_secrets(".env")
 
-    totp = TOTP(secrets_dict["test"])
+    totp_list = [TOTP(name=key, secret=value) for key, value in secrets_dict.items()]
 
     while True:
-        print(totp.get_totp())
+        for t in totp_list:
+            print(t)
+
+        print()
+
         time.sleep(5)
+
+
+if __name__ == "__main__":
+    main()
