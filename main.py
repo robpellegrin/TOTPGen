@@ -166,7 +166,10 @@ def main():
 
         print()
 
-        time.sleep(5)
+        try:
+            time.sleep(5)
+        except KeyboardInterrupt:
+            return
 
 
 if __name__ == "__main__":
