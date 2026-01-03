@@ -1,24 +1,24 @@
-import sys
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import QTimer, QSize
-from PyQt6.QtGui import QPixmap
-
-TOTP_COUNT = [767550, 123456, 909876, 582923, 987456]
-PROGRESS_BAR_TIME = 5
+from PyQt6.QtCore import QTimer
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    PROGRESS_BAR_TIME = 30  # Seconds
+
+    def __init__(self, totp_list):
         super().__init__()
         self.setWindowTitle("TOTPGen")
         self.layout = QVBoxLayout()
 
-        for totp_code in TOTP_COUNT:
-            frame = self.create_frame(f"{totp_code}")
+        self.totp_labels = []
+        self.totp_objects = []
+
+        for totp in totp_list:
+            frame = self.create_frame(totp)
             self.layout.addWidget(frame)
 
         self.progress_bar = QProgressBar(self)
-        self.progress_bar.setRange(0, PROGRESS_BAR_TIME)
+        self.progress_bar.setRange(0, self.PROGRESS_BAR_TIME)
 
         self.layout.addWidget(self.progress_bar)
         self.create_timer()
@@ -28,40 +28,40 @@ class MainWindow(QWidget):
         # TODO Window size should be a percentage of the display size/resolution.
         self.resize(300, 400)
 
-    def create_frame(self, totp_code):
-        totp = [123456, "Google", "youremail@domain.com"]
-
+    def create_frame(self, totp):
         frame = QFrame()
         frame_layout = QGridLayout()
 
-        for i in range(len(totp)):
-            font_size = 9
-            item = totp[i]
+        totp_label = QLabel(totp.get_totp())
+        totp_label.setStyleSheet(f"font-size: 16pt;")
 
-            if isinstance(item, int):
-                font_size = 16
-                item = str(item)
+        name_label = QLabel(totp.name)
+        name_label.setStyleSheet(f"font-size: 9pt;")
 
-            label = QLabel(item)
-            label.setStyleSheet(f"font-size: {font_size}pt;")
-            frame_layout.addWidget(label, i, 0)
+        account_label = QLabel(totp.account)
+        account_label.setStyleSheet(f"font-size: 9pt;")
+
+        frame_layout.addWidget(totp_label, 0, 0)
+        frame_layout.addWidget(name_label, 1, 0)
+        frame_layout.addWidget(account_label, 2, 0)
 
         frame.setLayout(frame_layout)
 
-        return frame
+        # Store the TOTP object and the label for later updates
+        self.totp_labels.append(totp_label)
+        self.totp_objects.append(totp)
 
-    def init_progress_bar(self):
-        pass
+        return frame
 
     def create_timer(self):
         # Timer to update the progress bar
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_progress)
-        self.current_value = PROGRESS_BAR_TIME
+        self.current_value = self.PROGRESS_BAR_TIME
         self.start_progress()
 
     def start_progress(self):
-        self.current_value = PROGRESS_BAR_TIME
+        self.current_value = self.PROGRESS_BAR_TIME
         self.progress_bar.setValue(self.current_value)
         self.timer.start(1000)  # Update every second
 
@@ -70,20 +70,12 @@ class MainWindow(QWidget):
             self.current_value -= 1
             self.progress_bar.setValue(self.current_value)
         else:
-            # Stop the timer when done
-            print("CODES EXPIRED")
             self.timer.stop()
-            print("Triggering refresh")
+            self.refresh_totp_codes()
             self.start_progress()
 
-
-def main():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-
-    sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    main()
+    def refresh_totp_codes(self):
+        for i, totp_label in enumerate(self.totp_labels):
+            # Regenerate TOTP for each corresponding TOTP object
+            new_totp = self.totp_objects[i].get_totp()
+            totp_label.setText(new_totp)
