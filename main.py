@@ -24,13 +24,13 @@ from totp import TOTP
 def load_secrets(filepath):
     """
     Loads secret key-values pairs from a given file.
-    Secrets are expected to be formatted as `key=value`.
+    Secrets are expected to be formatted as `key=value`, with one pair
+    per line.
 
     :param filepath: Path to file containing secrets.
     """
 
     secrets_dict = {}
-    file_contents = []
 
     try:
         with open(filepath, "r") as file:
@@ -57,8 +57,7 @@ def load_secrets(filepath):
 def main():
     secrets_dict = load_secrets(".env")
 
-    totp_list = [
-            TOTP(name=key, secret=value) for key, value in secrets_dict.items()]
+    totp_list = [TOTP(name=key, secret=value) for key, value in secrets_dict.items()]
 
     while True:
         for totp in totp_list:
