@@ -71,6 +71,14 @@ class TOTP:
         function."""
         return f"{self.name:<10}:  {self.get_totp_fmt()}"
 
+    def __lt__(self, other):
+        """
+        Allows for TOTP objects to be sorted with the built-in sort
+        function. TOTP objects are sorted using using the `name` member
+        variable.
+        """
+        return self.name < other.name
+
     def __custom_pack_q(self, value):
         """
         Pack an unsigned long long (8 bytes) into binary format. Can be
