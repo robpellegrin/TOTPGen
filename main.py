@@ -1,23 +1,23 @@
 """
-TOTPGen: A simple Python module for generating Time-based One-Time Passwords (TOTP) with minimal dependencies.
-
-This module provides functionality to generate secure one-time passwords
-using a shared secret.
-
-Usage:
+TOTPGen: A simple Python program for generating Time-based One-Time
+Passwords (TOTP) with minimal dependencies.
 
 Dependencies:
     - Requires Python 3.x and no additional libraries.
 
 Author:  Rob Pellegrin
 Date:    12/29/2025
-Updated: 12/30/2025
+Updated: 1/3/2026
 License: MIT License
 
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
 """
 
-from time import sleep
+from sys import exit, argv
+from PyQt6.QtWidgets import QApplication
+
+from totp import TOTP
+from view import MainWindow
 from totp import TOTP
 
 
@@ -28,9 +28,11 @@ def load_secrets(filepath):
     per line.
 
     :param filepath: Path to file containing secrets.
+    :return: A list of instantiated TOTP objects from the key-value
+             pairs in the input file.
     """
 
-    secrets_dict = {}
+    totp_list = []
 
     try:
         with open(filepath, "r") as file:
@@ -43,32 +45,24 @@ def load_secrets(filepath):
         raise PermissionError(f"Permission error on when opening {filepath}")
 
     for line in file_contents:
-        # Skip empty lines
         if len(line) <= 1:
-            continue
+            continue  # Skip empty lines
 
         key, value = line.split("=")
+        totp_list.append(TOTP(name=key.strip(), secret=value.strip()))
 
-        secrets_dict[key.strip()] = value.strip()
-
-    return secrets_dict
+    return totp_list
 
 
 def main():
-    secrets_dict = load_secrets(".env")
+    app = QApplication(argv)
 
-    totp_list = [TOTP(name=key, secret=value) for key, value in secrets_dict.items()]
+    totp_list = load_secrets(".env")
 
-    while True:
-        for totp in totp_list:
-            print(totp)
+    window = MainWindow(totp_list)
+    window.show()
 
-        print()
-
-        try:
-            sleep(5)
-        except KeyboardInterrupt:
-            return
+    exit(app.exec())
 
 
 if __name__ == "__main__":
