@@ -51,6 +51,8 @@ def load_secrets(filepath):
         key, value = line.split("=")
         totp_list.append(TOTP(name=key.strip(), secret=value.strip()))
 
+        totp_list.sort()
+
     return totp_list
 
 
