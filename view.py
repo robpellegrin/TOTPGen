@@ -35,11 +35,11 @@ class MainWindow(QWidget):
         frame_layout = QGridLayout()
 
         for i in range(len(totp)):
-            font_size = 10
+            font_size = 9
             item = totp[i]
 
             if isinstance(item, int):
-                font_size = 18
+                font_size = 16
                 item = str(item)
 
             label = QLabel(item)
