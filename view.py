@@ -57,7 +57,7 @@ class MainWindow(QWidget):
         # Timer to update the progress bar
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_progress)
-        self.current_value = self.PROGRESS_BAR_TIME
+
         self.start_progress()
 
     def start_progress(self):
