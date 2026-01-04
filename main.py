@@ -41,7 +41,7 @@ def load_secrets(filepath):
         raise FileNotFoundError(f"Could not open file at {filepath}") from e
 
     except PermissionError as e:
-        raise PermissionError(f"Permission error on when opening {filepath}") from e
+        raise PermissionError(f"Permission error opening {filepath}") from e
 
     for line in file_contents:
         if len(line) <= 1:
