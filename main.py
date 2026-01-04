@@ -13,12 +13,11 @@ License: MIT License
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
 """
 
-from sys import exit, argv
+from sys import argv
 from PyQt6.QtWidgets import QApplication
 
 from totp import TOTP
 from view import MainWindow
-from totp import TOTP
 
 
 def load_secrets(filepath):
@@ -35,14 +34,14 @@ def load_secrets(filepath):
     totp_list = []
 
     try:
-        with open(filepath, "r") as file:
+        with open(filepath, "r", encoding="UTF-8") as file:
             file_contents = file.readlines()
 
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Could not open file at {filepath}")
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Could not open file at {filepath}") from e
 
-    except PermissionError:
-        raise PermissionError(f"Permission error on when opening {filepath}")
+    except PermissionError as e:
+        raise PermissionError(f"Permission error on when opening {filepath}") from e
 
     for line in file_contents:
         if len(line) <= 1:
@@ -63,7 +62,6 @@ def main():
 
     window = MainWindow(totp_list)
     window.show()
-
     exit(app.exec())
 
 

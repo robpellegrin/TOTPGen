@@ -1,5 +1,12 @@
-from PyQt6.QtWidgets import *
 from PyQt6.QtCore import QTimer
+from PyQt6.QtWidgets import (
+    QVBoxLayout,
+    QProgressBar,
+    QFrame,
+    QGridLayout,
+    QLabel,
+    QWidget,
+)
 
 
 class MainWindow(QWidget):
@@ -9,6 +16,8 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("TOTPGen")
         self.layout = QVBoxLayout()
+
+        self.current_value = 30
 
         self.totp_labels = []
         self.totp_objects = []
@@ -33,13 +42,13 @@ class MainWindow(QWidget):
         frame_layout = QGridLayout()
 
         totp_label = QLabel(totp.get_totp())
-        totp_label.setStyleSheet(f"font-size: 16pt;")
+        totp_label.setStyleSheet("font-size: 16pt;")
 
         name_label = QLabel(totp.name)
-        name_label.setStyleSheet(f"font-size: 9pt;")
+        name_label.setStyleSheet("font-size: 9pt;")
 
         account_label = QLabel(totp.account)
-        account_label.setStyleSheet(f"font-size: 9pt;")
+        account_label.setStyleSheet("font-size: 9pt;")
 
         frame_layout.addWidget(totp_label, 0, 0)
         frame_layout.addWidget(name_label, 1, 0)

@@ -35,7 +35,8 @@ Methods:
                             binary format.
 
 Example:
-    totp = TOTP(secret="JBSWY3DPEHPK3PXP", name="My Account", account="user@example.com")
+    totp = TOTP(secret="JBSWY3DPEHPK3PXP", name="My Account", account=
+                    "user@example.com")
     print(totp)  # Display the TOTP in a formatted way
     print(totp.get_totp())  # Fetch the current TOTP
     print(totp.get_totp_fmt())  # Fetch the current TOTP in formatted style
@@ -53,7 +54,7 @@ from time import time
 
 class TOTP:
     def __init__(self, secret, name="NOT SET", account="your@email.com", digits=6):
-        self.__secret = secret
+        self.__secret = secret.upper()
         self.__digits = digits
         self.__last_updated = time()
 
@@ -96,8 +97,9 @@ class TOTP:
     def __set_hotp(self):
         """Generate an HMAC-based One-Time Passwords (HOTP) code."""
 
-        # Base32 decoding: Pads with '=' if necessary and converts the secret to bytes.
-        secret_padded = self.__secret.upper() + "=" * ((8 - len(self.__secret) % 8) % 8)
+        # Base32 decoding: Pads with '=' if necessary and converts the secret
+        # to bytes.
+        secret_padded = self.__secret + "=" * ((8 - len(self.__secret) % 8) % 8)
         secret_bytes = b32decode(secret_padded, casefold=True)
 
         # Convert the counter to a 64-bit, big-endian integer.
@@ -124,9 +126,9 @@ class TOTP:
     def __update_counter(self):
         """Updates the TOTP counter based on the current time."""
 
-        TIME_STEP = 30
+        time_step = 30
 
-        self.__counter = int(time() // TIME_STEP)
+        self.__counter = int(time() // time_step)
         self.__last_updated = datetime.now()
 
     def __is_old(self):
