@@ -13,15 +13,15 @@ License: MIT License
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
 """
 
+import os
 from sys import argv
 from PyQt6.QtWidgets import QApplication
 
 from totp import TOTP
-from secrets import SecretsFile
 from view import MainWindow
 
 
-def load_secrets(file_contents):
+def load_secrets(filepath):
     """
     Loads secret key-values pairs from a given file.
     Secrets are expected to be formatted as `key=value`, with one pair
@@ -34,25 +34,21 @@ def load_secrets(file_contents):
 
     totp_list = []
 
-    # try:
-    #     with open(filepath, "r", encoding="UTF-8") as file:
-    #         file_contents = file.readlines()
+    try:
+        with open(filepath, "r", encoding="UTF-8") as file:
+            file_contents = file.readlines()
 
-    # except FileNotFoundError as e:
-    #     raise FileNotFoundError(f"Could not open file at {filepath}") from e
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Could not open file at {filepath}") from e
 
-    # except PermissionError as e:
-    #     raise PermissionError(f"Permission error opening {filepath}") from e
+    except PermissionError as e:
+        raise PermissionError(f"Permission error opening {filepath}") from e
 
-    pos = 0
     for line in file_contents:
         if len(line) <= 1:
             continue  # Skip empty lines
 
-        print("LINE: " + line)
         key, value = line.split("=")
-
-        pos += 1
 
         totp_list.append(TOTP(name=key.strip(), secret=value.strip()))
         totp_list.sort()
@@ -61,12 +57,9 @@ def load_secrets(file_contents):
 
 
 def main():
-    x = SecretsFile()
-    slist = x.data
-    print(slist)
-    totp_list = load_secrets(slist)
-    x.remove_entry("test1")
-    x.finalize()
+    path_to_secrets = os.path.expanduser("~/.env")
+
+    totp_list = load_secrets(path_to_secrets)
 
     app = QApplication(argv)
 
