@@ -34,7 +34,8 @@ class MainWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        # TODO Window size should be a percentage of the display size/resolution.
+        # TODO Window size should be a percentage of the display
+        # size/resolution.
         self.resize(325, 400)
 
     def create_frame(self, totp):
