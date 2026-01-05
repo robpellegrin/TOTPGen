@@ -48,9 +48,15 @@ def load_secrets(filepath):
         if len(line) <= 1:
             continue  # Skip empty lines
 
-        key, value = line.split("=")
+        # Ignore comments
+        if "#" in line:
+            continue
 
-        totp_list.append(TOTP(name=key.strip(), secret=value.strip()))
+        name, secret, account = line.split(",")
+
+        totp_list.append(TOTP(name=name.strip(),
+                              secret=secret.strip(),
+                              account=account.strip()))
         totp_list.sort()
 
     return totp_list
