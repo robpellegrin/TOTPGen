@@ -35,14 +35,14 @@ class MainWindow(QWidget):
         self.setLayout(self.layout)
 
         # TODO Window size should be a percentage of the display size/resolution.
-        self.resize(300, 400)
+        self.resize(325, 400)
 
     def create_frame(self, totp):
         frame = QFrame()
         frame_layout = QGridLayout()
 
-        totp_label = QLabel(totp.get_totp())
-        totp_label.setStyleSheet("font-size: 16pt;")
+        totp_label = QLabel(totp.get_totp_fmt())
+        totp_label.setStyleSheet("font-size: 16pt; color: green;")
 
         name_label = QLabel(totp.name)
         name_label.setStyleSheet("font-size: 9pt;")
