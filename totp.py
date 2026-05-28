@@ -44,11 +44,10 @@ Example:
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
 """
 
-from datetime import datetime
-from hmac import new
-from hashlib import sha1
 from base64 import b32decode
-
+from datetime import datetime
+from hashlib import sha1
+from hmac import new
 from time import time
 
 

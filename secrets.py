@@ -1,6 +1,7 @@
-import os
-import hashlib
 import base64
+import hashlib
+import os
+
 from cryptography.fernet import Fernet
 
 

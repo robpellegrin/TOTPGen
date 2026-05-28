@@ -1,10 +1,10 @@
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import (
-    QVBoxLayout,
-    QProgressBar,
     QFrame,
     QGridLayout,
     QLabel,
+    QProgressBar,
+    QVBoxLayout,
     QWidget,
 )
 

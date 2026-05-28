@@ -1,20 +1,20 @@
 """
-TOTPGen: A simple Python program for generating Time-based One-Time
-Passwords (TOTP) with minimal dependencies.
+@author  Rob Pellegrin
+@date    12/29/2025
+@updated 05/28/2026
+@license MIT License
 
-Dependencies:
-    - Requires Python 3.x and no additional libraries.
-
-Author:  Rob Pellegrin
-Date:    12/29/2025
-Updated: 1/3/2026
-License: MIT License
+TOTPGen:
+    A simple Python program for generating time-based one-time
+    passwords (TOTP) from the command line with minimal dependencies.
 
 https://www.ietf.org/rfc/inline-errata/rfc6238.html
+
 """
 
 import os
 from sys import argv
+
 from PyQt6.QtWidgets import QApplication
 
 from totp import TOTP
@@ -27,9 +27,12 @@ def load_secrets(filepath):
     Secrets are expected to be formatted as `key=value`, with one pair
     per line.
 
-    :param filepath: Path to file containing secrets.
-    :return: A list of instantiated TOTP objects from the key-value
-             pairs in the input file.
+    Args
+        filepath: Path to file containing secrets.
+
+    Returns
+        A list of instantiated TOTP objects from the key-value pairs
+        in the input file.
     """
 
     totp_list = []
@@ -54,9 +57,13 @@ def load_secrets(filepath):
 
         name, secret, account = line.split(",")
 
-        totp_list.append(TOTP(name=name.strip(),
-                              secret=secret.strip(),
-                              account=account.strip()))
+        totp_list.append(
+            TOTP(
+                name=name.strip(),
+                secret=secret.strip(),
+                account=account.strip(),
+            )
+        )
         totp_list.sort()
 
     return totp_list
