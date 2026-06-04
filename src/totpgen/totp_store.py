@@ -10,6 +10,7 @@ import sqlite3
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Optional
+from typing_extensions import Self
 
 
 class TotpSecretStore:
@@ -83,7 +84,7 @@ class TotpSecretStore:
 
         self._execute(sql, tuple())
 
-    def __enter__(self) -> Any:
+    def __enter__(self) -> Self:
         self._create_table()
         return self
 
