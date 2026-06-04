@@ -39,4 +39,4 @@ def add() -> None:
         try:
             db.add(tup)
         except sqlite3.IntegrityError:
-            print(f'Token "{token.name}" already exists in ')
+            print(f'Token "{token[0]}" already exists in ')
