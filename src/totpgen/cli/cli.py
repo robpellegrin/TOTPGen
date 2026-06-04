@@ -17,6 +17,8 @@ TODO:
 import argparse
 from typing import Callable
 
+from totpgen.add import add
+
 
 def place_holder() -> None: ...
 
@@ -27,7 +29,7 @@ def init_add_subcommand(
     """ """
 
     add_parser = parser.add_parser(name="add", help="Add a new secret")
-    add_parser.set_defaults(func=place_holder)
+    add_parser.set_defaults(func=add)
 
     add_parser.add_argument(
         "-n",
@@ -61,20 +63,32 @@ def init_rename_subcommand(
     return parser
 
 
+def init_ls_subcommand(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:
+    """ """
+
+    rename_parser = parser.add_parser(name="ls", help="List all secrets")
+    rename_parser.set_defaults(func=place_holder)
+
+    return parser
+
+
 def init_args() -> argparse.ArgumentParser:
     subcommands: list[Callable] = [
+        init_ls_subcommand,
         init_add_subcommand,
         init_remove_subcommand,
         init_rename_subcommand,
     ]
 
     parser = argparse.ArgumentParser(
-        prog="totpgen",
+        prog="totp",
         description="A minimal, dependency free TOTP generator.",
     )
 
     subparser = parser.add_subparsers(
-        title="Manage Secrets",
+        title="Commands",
         dest="subcommands",
     )
 
@@ -89,28 +103,15 @@ def init_args() -> argparse.ArgumentParser:
         func=place_holder
     )
 
-    # List names associated with TOTP.
-    parser.add_argument(
-        "-l",
-        "--list",
-        type=str,
-        help="List services",
-    )
-
-    parser.add_argument(
-        "--gui",
-        action="store_true",
-        help="Display TOTP codes with a graphical interface.",
-    )
-
     return parser
 
 
-# Testing
-if __name__ == "__main__":
-    args = init_args()
-    r = args.parse_args()
-    print("-" * 20)
-    print(r)
-    print("-" * 20)
-    args.print_help()
+def get_args() -> argparse.Namespace:
+    parser = init_args()
+    args = parser.parse_args()
+
+    if args.subcommands is None:
+        parser.print_help()
+        raise SystemExit
+
+    return args
