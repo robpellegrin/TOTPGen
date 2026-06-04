@@ -9,7 +9,7 @@
 import sqlite3
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, Optional
 
 
 class TotpSecretStore:
@@ -29,7 +29,7 @@ class TotpSecretStore:
         """
         self._execute(sql, entry)
 
-    def get(self, name: str) -> tuple[str] | None:
+    def get(self, name: str) -> Any:
         sql = """
             SELECT *
             FROM secrets
@@ -69,8 +69,8 @@ class TotpSecretStore:
     def _execute(self, sql: str, tup: tuple[Any, ...]) -> None:
         try:
             self.cursor.execute(sql, tup)
-        except sqlite3.IntegrityError:
-            print("Integrity Error!")
+        except sqlite3.IntegrityError as exc:
+            raise exc from None
 
     def _create_table(self) -> None:
         sql = """
@@ -83,15 +83,15 @@ class TotpSecretStore:
 
         self._execute(sql, tuple())
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> Any:
         self._create_table()
         return self
 
     def __exit__(
         self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         self.conn.commit()
         self.conn.close()
@@ -119,7 +119,3 @@ def main() -> None:
         print(db.get("google"))
 
         db.remove("google")
-
-
-if __name__ == "__main__":
-    main()
