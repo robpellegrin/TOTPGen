@@ -2,7 +2,7 @@
 name = "TOTPGen"
 version = "0.0.1"
 authors = [
-  { name="Rob Pellegrin", email="" },
+  { name="Rob Pellegrin", email="none@none.com" },
 ]
 description = "A minimal, dependency free TOTP generator."
 readme = "README.md"
