@@ -18,6 +18,7 @@ import argparse
 from typing import Callable
 
 from totpgen.add import add
+from totpgen.remove import remove
 
 
 def place_holder() -> None: ...
@@ -47,7 +48,9 @@ def init_remove_subcommand(
     """ """
 
     remove_parser = parser.add_parser(name="remove", help="Remove secret")
-    remove_parser.set_defaults(func=place_holder)
+    remove_parser.set_defaults(func=remove)
+
+    remove_parser.add_argument("name", help="Remove an entry by name.")
 
     return parser
 
@@ -94,14 +97,6 @@ def init_args() -> argparse.ArgumentParser:
 
     for func in subcommands:
         func(subparser)
-
-    subparser.add_parser(
-        name="remove", description="Add a new secret"
-    ).set_defaults(func=place_holder)
-
-    subparser.add_parser(name="rename", description="Rename").set_defaults(
-        func=place_holder
-    )
 
     return parser
 
