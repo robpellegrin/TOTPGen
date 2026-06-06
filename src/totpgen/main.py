@@ -14,7 +14,7 @@ def main() -> None:
     args = cli.get_args()
 
     # Call function associated with sub-command.
-    args.func()
+    args.func(args)
 
 
 if __name__ == "__main__":
