@@ -18,7 +18,7 @@ from totpgen.totp_store import TotpSecretStore
 Token = namedtuple("Token", ["name", "secret", "issuer", "date"])
 
 
-def add() -> None:
+def add(args) -> None:
     try:
         token = [
             input("name: "),
