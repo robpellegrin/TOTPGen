@@ -1,1 +1,1 @@
-from .cli import get_args
+from totpgen.cli.cli import get_args
