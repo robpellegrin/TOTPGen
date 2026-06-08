@@ -19,6 +19,7 @@ from typing import Callable
 
 from totpgen.add import add
 from totpgen.remove import remove
+from totpgen.ls import ls
 
 
 def place_holder() -> None: ...
@@ -71,8 +72,16 @@ def init_ls_subcommand(
 ) -> argparse.ArgumentParser:
     """ """
 
-    rename_parser = parser.add_parser(name="ls", help="List all secrets")
-    rename_parser.set_defaults(func=place_holder)
+    ls_parser = parser.add_parser(name="ls", help="List all secrets")
+    ls_parser.set_defaults(func=ls)
+
+    ls_parser.add_argument(
+        "-t",
+        "--table",
+        action="store_true",
+        default=False,
+        help="Output as a table",
+    )
 
     return parser
 
