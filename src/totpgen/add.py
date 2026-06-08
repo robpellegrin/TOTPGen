@@ -6,6 +6,7 @@
 
 TODO:
     - Inputs need to be validated!
+    - Optional table formatting.
 
 """
 
@@ -19,19 +20,18 @@ Token = namedtuple("Token", ["name", "secret", "issuer", "date"])
 
 
 def add(args) -> None:
+    date = datetime.datetime.now().strftime("%Y/%m/%d")
+
     try:
         token = [
             input("name: "),
             input("secret: "),
             input("issuer: "),
-            datetime.datetime.now(),
+            date,
         ]
     except KeyboardInterrupt:
         print("")
         raise SystemExit
-
-    for i in token:
-        print(i)
 
     tup = tuple(token)
 
